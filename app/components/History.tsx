@@ -20,6 +20,11 @@ interface HistoryProps {
 export function History({ token, onItemClick }: HistoryProps) {
   const [history, setHistory] = useState<HistoryItem[]>([]);
 
+  const handleLogout = () => {
+    localStorage.removeItem("user")
+    window.location.reload();
+  }
+
   useEffect(() => {
     const fetchHistory = async () => {
       try {
@@ -32,7 +37,11 @@ export function History({ token, onItemClick }: HistoryProps) {
           const data = await response.json();
           setHistory(data);
         } else {
-          console.error('Failed to fetch history');
+            if (response.status === 403) {
+                handleLogout();
+              } else {
+                console.error(`Failed to fetch history. Status: ${response.status}`);
+              }
         }
       } catch (error) {
         console.error('Error fetching history:', error);

@@ -69,6 +69,7 @@ export default function AICodeGenerator() {
   const handleLogout = () => {
     setUser(null)
     localStorage.removeItem("user")
+    window.location.reload();
   }
 
   const handlePromptChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -122,7 +123,11 @@ export default function AICodeGenerator() {
           
           setGeneratedCode(' ' + trimmedCode)
         } else {
-          alert("Failed to generate code")
+          if (response.status === 403) {
+            handleLogout();
+          } else {
+            alert("Failed to generate code")
+          }
         }
       } catch (error) {
         console.error("Error generating code:", error)
@@ -164,7 +169,11 @@ export default function AICodeGenerator() {
         setExplanation(data.explanation)
         setIsExplanationModalOpen(true)
       } else {
-        alert("Failed to get explanation")
+        if (response.status === 403) {
+          handleLogout();
+        } else {
+          alert("Failed to get explanation")
+        }
       }
     } catch (error) {
       console.error("Error getting explanation:", error)
