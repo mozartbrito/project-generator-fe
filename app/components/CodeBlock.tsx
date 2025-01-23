@@ -5,10 +5,11 @@ import { Button } from "@/components/ui/button"
 import { ClipboardCopy } from 'lucide-react'
 
 interface CodeBlockProps {
-  code: string
+  code: string, 
+  isExplanation?: boolean
 }
 
-export default function CodeBlock({ code }: CodeBlockProps) {
+export default function CodeBlock({ code, isExplanation = false }: CodeBlockProps) {
   const [isCopied, setIsCopied] = useState(false)
 
   const copyToClipboard = useCallback(() => {

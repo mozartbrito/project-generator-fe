@@ -6,13 +6,13 @@ interface ImagePreviewProps {
 
 export default function ImagePreview({ images }: ImagePreviewProps) {
   if (images.length === 0) {
-    return <div className="text-sm text-gray-500">Nenhuma imagem selecionada</div>
+    return <div className="text-sm text-gray-500"></div>
   }
 
   return (
-    <div className="grid grid-cols-2 gap-2">
+    <div className="">
       {images.map((image, index) => (
-        <div key={index} className="relative h-20 w-full">
+        <div key={index} className="relative h-32 w-32 md:h-48 md:w-48 lg:h-64 lg:w-64">
           <Image
             src={URL.createObjectURL(image)}
             alt={`Prototype ${index + 1}`}

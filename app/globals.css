@@ -70,3 +70,58 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Add this to your existing CSS file */
+.prose {
+  max-width: 65ch;
+  color: var(--tw-prose-body);
+  line-height: 1.75;
+}
+
+.prose :where(h1, h2, h3, h4) {
+  color: var(--tw-prose-headings);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.prose :where(pre) {
+  background-color: var(--tw-prose-pre-bg);
+  border-radius: 0.375rem;
+  color: var(--tw-prose-pre-code);
+  font-size: 0.875em;
+  line-height: 1.7142857;
+  margin-bottom: 1.7142857em;
+  margin-top: 1.7142857em;
+  overflow-x: auto;
+  padding: 0.8571429em 1.1428571em;
+}
+
+.prose :where(code) {
+  color: var(--tw-prose-code);
+  font-size: 0.875em;
+  font-weight: 600;
+}
+
+.prose :where(code):not(:where([class~="not-prose"] *)) {
+  background-color: var(--tw-prose-code-bg);
+  border-radius: 0.25rem;
+  padding: 0.25rem 0.375rem;
+}
+
+.prose :where(a) {
+  color: var(--tw-prose-links);
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.prose :where(ul, ol) {
+  list-style-type: disc;
+  margin-bottom: 1.25em;
+  margin-top: 1.25em;
+  padding-left: 1.625em;
+}
+
+.prose :where(li) {
+  margin-bottom: 0.5em;
+  margin-top: 0.5em;
+}

@@ -17,7 +17,7 @@ export function Navbar({ username, onLogout }: NavbarProps) {
   return (
     <nav className="bg-primary text-primary-foreground p-4">
       <div className="container mx-auto flex justify-between items-center">
-        <span className="text-lg font-bold">AI Code Generator</span>
+        <span className="text-lg font-bold">Generator Project <small>(using AI)</small></span>
         <div className="flex items-center space-x-4">
           <span>Olá, {username}</span>
           <Button variant="secondary" onClick={handleLogout}>

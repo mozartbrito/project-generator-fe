@@ -1,7 +1,9 @@
 "use client"
 
 import type React from "react"
+import { useRef } from 'react';
 
+import config from '@/config';
 import { useState, useCallback, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
@@ -11,10 +13,14 @@ import dynamic from "next/dynamic"
 import { Login } from "./components/Login"
 import { History } from "./components/History"
 import { Navbar } from "./components/Navbar"
-import { Maximize2, Minimize2, Trash2 } from "lucide-react"
+import { Maximize2, Minimize2, Trash2, HelpCircle, CircleAlert  } from "lucide-react"
+import ExplanationModal from "./components/ExplanationModal"
+import AboutModal from "./components/AboutModal"
 
 const CodeBlock = dynamic(() => import("./components/CodeBlock"), { ssr: false })
 const ImagePreview = dynamic(() => import("./components/ImagePreview"), { ssr: false })
+
+const currentYear = new Date().getFullYear()
 
 interface User {
   username: string
@@ -40,6 +46,12 @@ export default function AICodeGenerator() {
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [isPreviewLoading, setIsPreviewLoading] = useState(false)
   const [isCodeLoading, setIsCodeLoading] = useState(false)
+  const [explanation, setExplanation] = useState("")
+  const [isExplaining, setIsExplaining] = useState(false)
+  const [isExplanationModalOpen, setIsExplanationModalOpen] = useState(false)
+  const [isAboutModalOpen, setIsAboutModalOpen] = useState(false)
+
+  const apiUrl = config.apiBaseUrl;
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user")
@@ -76,6 +88,12 @@ export default function AICodeGenerator() {
         alert("Please log in first")
         return
       }
+
+      if (!prompt && images.length === 0) {
+        alert("Por favor preencha o prompt ou escolha um arquivo!")
+        return
+      }
+
       setIsLoading(true)
       setIsPreviewLoading(true)
       setIsCodeLoading(true)
@@ -86,7 +104,7 @@ export default function AICodeGenerator() {
           formData.append("image", images[0])
         }
 
-        const response = await fetch("http://localhost:3001/api/code-generation/generate", {
+        const response = await fetch(`${apiUrl}/code-generation/generate`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${user.token}`,
@@ -118,6 +136,44 @@ export default function AICodeGenerator() {
     [prompt, images, user],
   )
 
+  const handleAbout = () => {
+    setIsAboutModalOpen(!isAboutModalOpen)
+  }
+
+  const handleExplain = useCallback(async () => {
+    if (!user || !generatedCode) {
+      alert("Please log in and generate code first")
+      return
+    }
+    if (explanation) {
+      setIsExplanationModalOpen(true)
+      return
+    }
+    setIsExplaining(true)
+    try {
+      const response = await fetch(`${apiUrl}/code-generation/generate?type=explain`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+        body: JSON.stringify({ code: generatedCode }),
+      })
+      if (response.ok) {
+        const data = await response.json()
+        setExplanation(data.explanation)
+        setIsExplanationModalOpen(true)
+      } else {
+        alert("Failed to get explanation")
+      }
+    } catch (error) {
+      console.error("Error getting explanation:", error)
+      alert("An error occurred while getting the explanation")
+    } finally {
+      setIsExplaining(false)
+    }
+  }, [user, generatedCode, explanation])
+
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen)
   }
@@ -127,7 +183,13 @@ export default function AICodeGenerator() {
     setImages([])
     setGeneratedCode("")
     setIframeContent("")
+    setExplanation("")
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   }
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleHistoryItemClick = (item: HistoryItem) => {
     setPrompt(item.prompt)
@@ -144,6 +206,7 @@ export default function AICodeGenerator() {
         .replace(/```$/, ""),
     )
     setActiveTab("generator")
+    setExplanation("")
   }
 
   if (!user) {
@@ -156,7 +219,7 @@ export default function AICodeGenerator() {
       <div className={`flex-grow container mx-auto p-4 ${isFullscreen ? "fixed inset-0 z-50 bg-background" : ""}`}>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="generator">Gerador de Código</TabsTrigger>
+            <TabsTrigger value="generator">Funcionalidade Principal</TabsTrigger>
             <TabsTrigger value="history">Histórico</TabsTrigger>
           </TabsList>
           <TabsContent value="generator">
@@ -164,7 +227,20 @@ export default function AICodeGenerator() {
               {!isFullscreen && (
                 <Card className="w-full">
                   <CardHeader>
-                    <CardTitle>Gerador de Código IA</CardTitle>
+                    <CardTitle>Gerador de Projectos</CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                    Gerador de Interfaces em HTML com IA
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={handleAbout}
+                    >
+                      <CircleAlert className="h-4 w-4 mr-2" />
+                    </Button>
+                    </p>
+                    
+
+
                   </CardHeader>
                   <form onSubmit={handleSubmit}>
                     <CardContent className="space-y-4">
@@ -191,23 +267,34 @@ export default function AICodeGenerator() {
                             accept="image/*"
                             name="image"
                             onChange={handleImageUpload}
+                            ref={fileInputRef}
                             className="w-full sm:w-1/2 text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
                           />
-                          <div className="w-full sm:w-1/2">
-                            <ImagePreview images={images} />
-                          </div>
+                          
                         </div>
                       </div>
                     </CardContent>
-                    <CardFooter>
+                    <CardFooter className="flex flex-row gap-4">
                       <Button type="submit" disabled={isLoading} className="w-full">
-                        {isLoading ? "Gerando Código..." : "Gerar Código"}
+                        {isLoading ? "Gerando..." : "Gerar Interfaces e Código"}
                       </Button>
                       <Button type="button" variant="outline" onClick={clearForm} className="w-full">
                         <Trash2 className="h-4 w-4 mr-2" />
                         Limpar Formulário
                       </Button>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        onClick={handleExplain}
+                        disabled={isExplaining || !generatedCode}
+                      >
+                        <HelpCircle className="h-4 w-4 mr-2" />
+                        Explicar Solução
+                      </Button>
                     </CardFooter>
+                    <div className="w-full sm:w-1/2 mx-auto my-3">
+                      <ImagePreview images={images} />
+                    </div>
                   </form>
                 </Card>
               )}
@@ -244,7 +331,7 @@ export default function AICodeGenerator() {
                           <span className="loading loading-spinner loading-lg"></span>
                         </div>
                       ) : (
-                        <CodeBlock code={generatedCode} />
+                        <CodeBlock code={generatedCode} isExplanation={false} />
                       )}
                     </TabsContent>
                   </Tabs>
@@ -257,6 +344,18 @@ export default function AICodeGenerator() {
           </TabsContent>
         </Tabs>
       </div>
+      <ExplanationModal
+        isOpen={isExplanationModalOpen}
+        onClose={() => setIsExplanationModalOpen(false)}
+        explanation={explanation}
+      />
+      <AboutModal
+        isOpen={isAboutModalOpen}
+        onClose={() => setIsAboutModalOpen(false)}
+      />
+      <footer className="py-4 text-center text-sm text-gray-600">
+        Mozart Teixeira de Brito - Projecto de Mestrado em Engenharia Informática &copy; {currentYear}
+      </footer>
     </div>
   )
 }

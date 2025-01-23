@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import config from "@/config";
+
+const apiUrl = config.apiBaseUrl;
 
 interface HistoryItem {
   id: number;
@@ -20,7 +23,7 @@ export function History({ token, onItemClick }: HistoryProps) {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/code-generation/history', {
+        const response = await fetch(`${apiUrl}/code-generation/history`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
