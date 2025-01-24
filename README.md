@@ -1,6 +1,6 @@
-# Guia de Instalação do Frontend do Gerador de Código IA
+# Guia de Instalação do Frontend do Generator Project
 
-Este guia irá orientá-lo através do processo de configuração do componente frontend do projeto Gerador de Código IA.
+Este guia irá orientá-lo através do processo de configuração do componente frontend do projeto Generator Project.
 
 ## Pré-requisitos
 
