@@ -12,8 +12,8 @@ Este guia irá orientá-lo através do processo de configuração do componente 
 
 1. Clone o repositório do frontend:
    ```
-   git clone https://github.com/seu-nome-de-utilizador/gerador-de-codigo-ia-frontend.git
-   cd gerador-de-codigo-ia-frontend
+   git clone https://github.com/mozartbrito/project-generator-fe.git
+   cd project-generator-fe
    ```
 
 2. Instale as dependências:
