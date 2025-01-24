@@ -41,7 +41,7 @@ export function Login({ onLogin }: LoginProps) {
   return (
     <div className="flex flex-col items-center space-y-6 justify-center h-screen">
       {/* Título principal */}
-      <h1 className="text-2xl font-bold text-center">Project Generator</h1>
+      <h1 className="text-2xl font-bold text-center">Generator Project <small>(using AI)</small></h1>
     <Card className="w-full max-w-md mx-auto mt-8">
       <CardHeader>
         <CardTitle>Login</CardTitle>
