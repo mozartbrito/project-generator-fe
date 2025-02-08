@@ -225,7 +225,7 @@ export default function AICodeGenerator() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar username={user.username} onLogout={handleLogout} />
-      <div className={`flex-grow container mx-auto p-4 ${isFullscreen ? "fixed inset-0 z-50 bg-background" : ""}`}>
+      <div className={`flex-grow container mx-auto p-4 ${isFullscreen ? "fixed inset-0 z-50 bg-background overflow-y-auto" : ""}`}>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="generator">Funcionalidade Principal</TabsTrigger>
@@ -340,7 +340,7 @@ export default function AICodeGenerator() {
                           <span className="loading loading-spinner loading-lg"></span>
                         </div>
                       ) : (
-                        <CodeBlock code={generatedCode} isExplanation={false} />
+                        <CodeBlock code={generatedCode} />
                       )}
                     </TabsContent>
                   </Tabs>

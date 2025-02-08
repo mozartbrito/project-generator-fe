@@ -1,6 +1,5 @@
 import type React from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
-import ReactMarkdown from "react-markdown"
 
 interface ExplanationModalProps {
   isOpen: boolean

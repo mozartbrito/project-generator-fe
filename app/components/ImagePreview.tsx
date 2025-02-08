@@ -6,7 +6,7 @@ interface ImagePreviewProps {
 
 export default function ImagePreview({ images }: ImagePreviewProps) {
   if (images.length === 0) {
-    return <div className="text-sm text-gray-500"></div>
+    return <div className="text-sm text-gray-500">No images to display</div>
   }
 
   return (

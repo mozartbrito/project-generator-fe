@@ -19,6 +19,7 @@ interface HistoryProps {
 
 export function History({ token, onItemClick }: HistoryProps) {
   const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   const handleLogout = () => {
     localStorage.removeItem("user")
@@ -33,6 +34,16 @@ export function History({ token, onItemClick }: HistoryProps) {
             'Authorization': `Bearer ${token}`
           }
         });
+
+        if (response.status === 403) {
+          setError("Unauthorized");
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch");
+        }
+
         if (response.ok) {
           const data = await response.json();
           setHistory(data);
@@ -44,12 +55,21 @@ export function History({ token, onItemClick }: HistoryProps) {
               }
         }
       } catch (error) {
+        setError("Error fetching history");
         console.error('Error fetching history:', error);
       }
     };
 
     fetchHistory();
   }, [token]);
+
+  if (error) {
+    return <div className="text-sm text-red-500">{error}</div>;
+  }
+
+  if (history.length === 0) {
+    return <div className="text-sm text-gray-500">No history items to display</div>;
+  }
 
   return (
     <Card className="w-full">
